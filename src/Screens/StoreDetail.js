@@ -10,9 +10,10 @@ import {
   Image,
   Animated,
   Platform,
+  Dimensions,
 } from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {navDate, menus} from '../../data';
+import {navDate, menus, storeName} from '../../data';
 import StoreInfo from './StoreInfo';
 import TopNavigation from '../Components/TopNavigation';
 
@@ -40,33 +41,67 @@ const StoreDetail = () => {
           <Text style={{color: '#fff'}}>{menu.item.name}</Text>
         </View>
         {menu.item.details?.map((detail, index) => (
-          <View
-            key={index}
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              paddingVertical: 10,
-              paddingHorizontal: 10,
-              backgroundColor: '#EDF7FA',
-            }}>
-            <Image
+          <>
+            <View
+              key={index}
               style={{
-                width: 50,
-                height: 50,
-                borderRadius: 10,
-                marginRight: 10,
-                resizeMode: 'cover',
-                backgroundColor: '#ccc',
-              }}
-              source={{
-                uri: `${detail.img}`,
+                flexWrap: 'wrap',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingVertical: 15,
+                paddingHorizontal: 10,
+                backgroundColor: '#fff',
+              }}>
+              <View style={{flex: 3.5, marginRight: 10}}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 'bold',
+                    marginBottom: 5,
+                  }}>
+                  {detail.name}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: '#666',
+                    lineHeight: 20,
+                    marginBottom: 5,
+                  }}>
+                  {detail.description}
+                </Text>
+                <Text style={{fontSize: 14}}>{detail.price}원</Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  alignSelf: 'flex-end',
+                  backgroundColor: 'pink',
+                }}>
+                <Image
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 5,
+                    marginRight: 10,
+                    resizeMode: 'cover',
+                    backgroundColor: '#ccc',
+                  }}
+                  source={{
+                    uri: `${detail.img}`,
+                  }}
+                />
+              </View>
+            </View>
+            <View
+              style={{
+                height: 1,
+                width: Dimensions.get('window').width,
+                backgroundColor: '#ececec',
               }}
             />
-            {/* <Text>{detail.img}</Text> */}
-            <Text style={{fontSize: 14, marginRight: 10}}>{detail.name}</Text>
-            <Text style={{fontSize: 14}}>{detail.price}</Text>
-          </View>
+          </>
         ))}
       </View>
     );
@@ -129,7 +164,7 @@ const StoreDetail = () => {
   const ListHeaderComponent = () => {
     return (
       <View style={{backgroundColor: '#fff'}}>
-        <StoreInfo animatedValue={scrolling} />
+        <StoreInfo storeName={storeName} animatedValue={scrolling} />
         <View style={{height: 10, backgroundColor: '#ececec'}} />
         <ScrollComponent />
       </View>
@@ -137,16 +172,9 @@ const StoreDetail = () => {
   };
 
   const onViewRef = React.useRef(viewableItems => {
-    console.log('viewableItems', viewableItems);
-
-    if (viewableItems) {
-      let selectId = viewableItems.viewableItems[0].item.id;
-      setSelectedId(selectId);
-    } else {
-      setSelectedId(0);
-    }
-
-    // Use viewable items in state or as intended
+    // console.log('viewableItems', viewableItems);
+    let selectId = viewableItems.viewableItems[0].item.id;
+    setSelectedId(selectId);
   });
 
   const viewConfigRef = React.useRef({
@@ -158,7 +186,7 @@ const StoreDetail = () => {
 
   return (
     <>
-      <TopNavigation title="한끼한죽" animatedValue={scrolling} />
+      <TopNavigation title={storeName} animatedValue={scrolling} />
       <View style={{zIndex: -1}}>
         <Animated.FlatList
           ref={refContainer}
@@ -180,22 +208,6 @@ const StoreDetail = () => {
           viewabilityConfig={viewConfigRef.current}
         />
       </View>
-      {/* <Animated.View
-        style={{
-          position: 'absolute',
-          top: Platform.OS === 'ios' ? 25 : 0,
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          backgroundColor: '#fff',
-          transform: [
-            {
-              translateY: translation,
-            },
-          ],
-        }}>
-        <ScrollComponent />
-      </Animated.View> */}
     </>
   );
 };
