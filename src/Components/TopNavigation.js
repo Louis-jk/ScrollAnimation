@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Animated,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {BANNER_H, TOPNAVI_H} from '../constans';
@@ -15,10 +16,7 @@ const TopNavigation = props => {
   const isFloating = !!animatedValue;
   const [isTransparent, setTransparent] = useState(isFloating);
   const safeArea = useSafeAreaInsets();
-
-  console.log('animatedValue', animatedValue);
-  console.log('safeArea', safeArea);
-  console.log('isFloating', isFloating);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!animatedValue) {
@@ -39,7 +37,8 @@ const TopNavigation = props => {
         translucent
         backgroundColor="transparent"
       />
-      <View style={styles.container(safeArea, isFloating, isTransparent)}>
+      <Animated.View
+        style={styles.container(safeArea, isFloating, isTransparent, fadeAnim)}>
         <TouchableOpacity>
           <Image
             source={
@@ -51,6 +50,9 @@ const TopNavigation = props => {
             resizeMode="cover"
           />
         </TouchableOpacity>
+        {isTransparent ? null : (
+          <Text style={styles.title(isTransparent)}>{title}</Text>
+        )}
         <TouchableOpacity>
           <Image
             source={
@@ -62,19 +64,18 @@ const TopNavigation = props => {
             resizeMode="cover"
           />
         </TouchableOpacity>
-        {/* <Text style={styles.title(isTransparent)}>{title}</Text> */}
-      </View>
+      </Animated.View>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: (safeArea, isFloating, isTransparent) => ({
+  container: (safeArea, isFloating, isTransparent, fadeAnim) => ({
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItem: 'center',
-    paddingTop: safeArea.top,
+    paddingTop: safeArea.top + 10,
     marginBottom: isFloating ? -TOPNAVI_H - safeArea.top : 0,
     height: TOPNAVI_H + safeArea.top,
     shadowOffset: {y: 0},
@@ -84,10 +85,10 @@ const styles = StyleSheet.create({
     zIndex: 100,
   }),
   title: isTransparent => ({
-    textAlign: 'center',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
     color: isTransparent ? '#FFF' : '#000',
+    marginTop: 3,
   }),
 });
 
