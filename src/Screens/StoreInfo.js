@@ -10,7 +10,7 @@ import {
   Animated,
 } from 'react-native';
 import PagerView from 'react-native-pager-view';
-import TopNavigation from '../Components/TopNavigation';
+import Tab01 from '../Components/Tab01';
 import {BANNER_H} from '../constans';
 
 // const MyPager = () => {
@@ -26,7 +26,7 @@ import {BANNER_H} from '../constans';
 //   );
 // };
 
-const StoreInfo = ({animatedValue}) => {
+const StoreInfo = ({animatedValue, storeName}) => {
   return (
     <View>
       <View style={styles.bannerContainer}>
@@ -65,7 +65,7 @@ const StoreInfo = ({animatedValue}) => {
               alignContent: 'center',
             }}>
             <Text style={{textAlign: 'center', fontSize: 25, marginBottom: 15}}>
-              집밥한끼
+              {storeName}
             </Text>
             <View
               style={{
@@ -174,6 +174,7 @@ const StoreInfo = ({animatedValue}) => {
       </View>
       {/* //쿠폰 */}
       {/* 가게 정보 탭 */}
+      <Tab01 />
       {/* <MyPager /> */}
       {/* //가게 정보 탭 */}
     </View>
