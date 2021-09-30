@@ -1,239 +1,157 @@
 import * as React from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   Image,
   Animated,
-  Platform,
   Dimensions,
+  TouchableWithoutFeedback,
 } from 'react-native';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {useSelector, useDispatch} from 'react-redux';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {navDate, menus, storeName} from '../../data';
+import {TAB_TITLE, TOPNAVI_H} from '../constans';
 import StoreInfo from './StoreInfo';
 import TopNavigation from '../Components/TopNavigation';
+import Tab02 from '../Components/Tab02';
+import pageAction from '../redux/actions';
 
 const StoreDetail = () => {
   const [selectedId, setSelectedId] = React.useState(0); // 선택 메뉴 아이디 저장
-  const refContainer = React.useRef(null); // FlatList Ref 생성
   const scrolling = React.useRef(new Animated.Value(0)).current; // Animated 이벤트 생성
-
-  const translation = scrolling.interpolate({
-    inputRange: [100, 200, 250, 500],
-    outputRange: [-200, -200, 0, 0],
-    extrapolate: 'clamp',
-  });
-
-  // 메뉴(카테고리) 리스트 렌더러(FlatList)
-  const renderItem = (menu, index) => {
-    return (
-      <View key={menu.item.index}>
-        <View
-          style={{
-            paddingVertical: 18,
-            paddingHorizontal: 20,
-            backgroundColor: '#851D41',
-          }}>
-          <Text style={{color: '#fff'}}>{menu.item.name}</Text>
-        </View>
-        {menu.item.details?.map((detail, index) => (
-          <>
-            <View
-              key={index}
-              style={{
-                flexWrap: 'wrap',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingVertical: 15,
-                paddingHorizontal: 10,
-                backgroundColor: '#fff',
-              }}>
-              <View style={{flex: 3.5, marginRight: 10}}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 'bold',
-                    marginBottom: 5,
-                  }}>
-                  {detail.name}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: '#666',
-                    lineHeight: 20,
-                    marginBottom: 5,
-                  }}>
-                  {detail.description}
-                </Text>
-                <Text style={{fontSize: 14}}>{detail.price}원</Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  alignSelf: 'flex-end',
-                  backgroundColor: 'pink',
-                }}>
-                <Image
-                  style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 5,
-                    marginRight: 10,
-                    resizeMode: 'cover',
-                    backgroundColor: '#ccc',
-                  }}
-                  source={{
-                    uri: `${detail.img}`,
-                  }}
-                />
-              </View>
-            </View>
-            <View
-              style={{
-                height: 1,
-                width: Dimensions.get('window').width,
-                backgroundColor: '#ececec',
-              }}
-            />
-          </>
-        ))}
-      </View>
-    );
-  };
-
-  const getItemLayout = (data, index) => {
-    console.log('getItemLayout data', data);
-    console.log('getItemLayout data[0].name :: ', data[0].name);
-    return {
-      length: styles.listItem.height,
-      offset: styles.listItem.height * index,
-      index,
-    };
-  };
-
-  const ScrollComponent = () => {
-    return (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={{
-          paddingVertical: 10,
-        }}>
-        {navDate?.map((menu, index) => (
-          <TouchableOpacity
-            key={menu.id}
-            activeOpacity={1}
-            onPress={() => {
-              refContainer.current.scrollToIndex({
-                animated: true,
-                index: menu.id,
-                viewOffset: 60,
-                viewPosition: 0,
-              });
-              setSelectedId(menu.id);
-            }}
-            style={{
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-            }}>
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: 'bold',
-                backgroundColor:
-                  selectedId === menu.id ? '#851D41' : 'transparent',
-                color: selectedId === menu.id ? '#fff' : '#222',
-                borderRadius: 15,
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-              }}>
-              {menu.name}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-    );
-  };
-  // 상단 컴포넌트
-  const ListHeaderComponent = () => {
-    return (
-      <View style={{backgroundColor: '#fff'}}>
-        <StoreInfo storeName={storeName} animatedValue={scrolling} />
-        <View style={{height: 10, backgroundColor: '#ececec'}} />
-        <ScrollComponent />
-      </View>
-    );
-  };
-
-  const onViewRef = React.useRef(viewableItems => {
-    // console.log('viewableItems', viewableItems);
-    let selectId = viewableItems.viewableItems[0].item.id;
-    setSelectedId(selectId);
-  });
-
-  const viewConfigRef = React.useRef({
-    waitForInteraction: true,
-    viewAreaCoveragePercentThreshold: 95,
-  });
-
-  console.log('selectedId', selectedId);
+  const {isView, selectType} = useSelector(state => state.page);
+  const [type, setType] = React.useState(0);
+  const safeArea = useSafeAreaInsets();
+  const dispatch = useDispatch();
 
   return (
     <>
       <TopNavigation title={storeName} animatedValue={scrolling} />
+      {isView && (
+        <View style={styles.fixedTabContainer(safeArea.top)}>
+          <View
+            style={{
+              flex: 1,
+              height: '100%',
+              borderWidth: 1,
+              borderBottomWidth: selectType === 0 ? 0 : 1,
+              borderLeftWidth: 0,
+              borderRightWidth: selectType === 0 ? 1 : 0,
+              borderColor: '#e6e6e6',
+              borderTopColor: '#222',
+              borderTopWidth: selectType === 0 ? 2 : 0,
+            }}>
+            <TouchableWithoutFeedback
+              onPress={() => dispatch(pageAction.setTab02Type(0))}>
+              <View style={{paddingTop: 15}}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: TAB_TITLE,
+                    fontWeight: selectType === 0 ? 'bold' : 'normal',
+                    color: selectType === 0 ? '#222' : '#666',
+                    marginTop: selectType === 0 ? 0 : 2,
+                  }}>
+                  메뉴
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              height: '100%',
+              borderWidth: 1,
+              borderBottomWidth: selectType === 1 ? 0 : 1,
+              borderLeftWidth: selectType === 1 ? 1 : 0,
+              borderRightWidth: selectType === 1 ? 1 : 0,
+              borderColor: '#e6e6e6',
+              borderTopColor: '#222',
+              borderTopWidth: selectType === 1 ? 2 : 0,
+            }}>
+            <TouchableWithoutFeedback
+              onPress={() => dispatch(pageAction.setTab02Type(1))}>
+              <View style={{paddingTop: 15}}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: TAB_TITLE,
+                    fontWeight: selectType === 1 ? 'bold' : 'normal',
+                    color: selectType === 1 ? '#222' : '#666',
+                    marginTop: selectType === 1 ? 0 : 2,
+                  }}>
+                  정보
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              height: '100%',
+              borderWidth: 1,
+              borderBottomWidth: selectType === 2 ? 0 : 1,
+              borderRightWidth: 0,
+              borderLeftWidth: selectType === 2 ? 1 : 0,
+              borderColor: '#e6e6e6',
+              borderTopColor: '#222',
+              borderTopWidth: selectType === 2 ? 2 : 0,
+            }}>
+            <TouchableWithoutFeedback
+              onPress={() => dispatch(pageAction.setTab02Type(2))}>
+              <View style={{paddingTop: 15}}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: TAB_TITLE,
+                    fontWeight: selectType === 2 ? 'bold' : 'normal',
+                    color: selectType === 2 ? '#222' : '#666',
+                    marginTop: selectType === 2 ? 0 : 2,
+                  }}>
+                  리뷰
+                </Text>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </View>
+      )}
       <View style={{zIndex: -1}}>
-        <Animated.FlatList
-          ref={refContainer}
-          data={menus}
-          renderItem={renderItem}
-          initialScrollIndex={0}
-          keyExtractor={item => item.id}
-          // getItemLayout={getItemLayout}
-          ListHeaderComponent={<ListHeaderComponent />}
-          // onScroll={e => console.log(e.nativeEvent.contentOffset.y)}
+        <Animated.ScrollView
+          nestedScrollEnabled
           onScroll={Animated.event(
             [{nativeEvent: {contentOffset: {y: scrolling}}}],
             {
               useNativeDriver: true,
             },
           )}
-          scrollEventThrottle={16}
-          onViewableItemsChanged={onViewRef.current}
-          viewabilityConfig={viewConfigRef.current}
-        />
+          scrollEventThrottle={16}>
+          <View style={{backgroundColor: '#fff'}}>
+            <StoreInfo storeName={storeName} animatedValue={scrolling} />
+            <View style={{height: 1, backgroundColor: '#e5e5e5'}} />
+            <View style={{height: 10, backgroundColor: '#f5f5f5'}} />
+            <Tab02 animatedValue={scrolling} />
+          </View>
+        </Animated.ScrollView>
       </View>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  listItem: {
-    flex: 1,
-    backgroundColor: 'yellow',
-    justifyContent: 'center',
-  },
+  fixedTabContainer: safeAreaTop => ({
+    // paddingTop: safeAreaTop + 10,
+    position: 'absolute',
+    top: TOPNAVI_H + safeAreaTop,
+    width: Dimensions.get('window').width,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-start',
+    height: 50,
+    backgroundColor: '#fff',
+    zIndex: 100,
+  }),
 });
 
 export default StoreDetail;
