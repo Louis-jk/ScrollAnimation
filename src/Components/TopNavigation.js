@@ -80,8 +80,8 @@ const styles = StyleSheet.create({
     height: TOPNAVI_H + safeArea.top,
     shadowOffset: {y: 0},
     backgroundColor: isTransparent ? '#0001' : '#FFF',
-    shadowOpacity: isTransparent ? 0 : 0.5,
-    elevation: isTransparent ? 0.01 : 5,
+    shadowOpacity: isTransparent ? 0 : 0,
+    elevation: isTransparent ? 0.01 : 0,
     zIndex: 100,
   }),
   title: isTransparent => ({
