@@ -13,25 +13,14 @@ import PagerView from 'react-native-pager-view';
 import Tab01 from '../Components/Tab01';
 import {BANNER_H} from '../constans';
 
-// const MyPager = () => {
-//   return (
-//     <PagerView style={styles.pagerView} initialPage={0}>
-//       <View key="1">
-//         <Text>First page</Text>
-//       </View>
-//       <View key="2">
-//         <Text>Second page</Text>
-//       </View>
-//     </PagerView>
-//   );
-// };
-
 const StoreInfo = ({animatedValue, storeName}) => {
   return (
     <View>
       <View style={styles.bannerContainer}>
         <Animated.Image
-          source={require('../images/main01.jpg')}
+          source={{
+            uri: 'https://i.pinimg.com/originals/c4/ca/24/c4ca24ea9bb19c7dd6f44aaf0a636cb4.jpg',
+          }}
           style={styles.banner(animatedValue)}
           resizeMode="cover"
         />
@@ -175,7 +164,6 @@ const StoreInfo = ({animatedValue, storeName}) => {
       {/* //쿠폰 */}
       {/* 가게 정보 탭 */}
       <Tab01 />
-      {/* <MyPager /> */}
       {/* //가게 정보 탭 */}
     </View>
   );
